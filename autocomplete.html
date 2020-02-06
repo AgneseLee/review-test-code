@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>AutoComplete</title>
+  <style>
+    #keyword {
+      width: 200px;
+      height: 30px;
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <input id="keyword" type="text" />
+
+  <script>
+    class AutoComplete {
+      constructor(id) {
+        this.word = "";
+        this.res = [];
+        this.elm = null;
+        this.oldUl = null;
+        appendCss()
+
+        const vm = this;
+        if (id) {
+          this.elm = document.getElementById(id);
+          this.elm.addEventListener("input", function (event) {
+            vm.word = event.target.value;
+            vm.doAction();
+          });
+        }
+      }
+
+      search() {
+        const libary = [
+          "abcde",
+          "abbbb",
+          "cdvv",
+          "gufis",
+          "abd",
+          "abcdeofofo",
+          "abcmkide",
+          "abcdefty",
+          "abcdefghijk"
+        ];
+        this.res = libary.filter(word => word.includes(this.word));
+        this.renderRes();
+      }
+
+      doAction() {
+        this.destroyRes();
+        throttle.call(this, 0.4, this.search);
+      }
+
+      renderRes() {
+        const vm = this;
+        let fragment = document.createDocumentFragment();
+        this.res.forEach(t => {
+          let li = document.createElement("li");
+          li.innerHTML = t;
+          li.addEventListener("click", function (event) {
+            vm.elm.value = event.target.innerHTML;
+          });
+          fragment.appendChild(li);
+        });
+        const ul = document.createElement("ul");
+        ul.id = "result";
+        ul.appendChild(fragment);
+        this.oldUl = ul;
+        this.elm.parentElement.appendChild(ul);
+      }
+
+      destroyRes() {
+        if (this.oldUl) {
+          this.elm.parentElement.removeChild(this.oldUl);
+        }
+      }
+
+
+    }
+      
+
+    // 防抖函数
+    function throttle(delay, fn) {
+      let timer = null;
+      let ctx = this;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout((...args) => {
+        fn.apply(ctx, args);
+        ctx = null;
+      }, delay * 1000);
+    }
+
+    // 增加css
+    function appendCss() {
+      let style = document.createElement('style')
+      style.innerHTML = `#result{padding-top: 10px;width: 200px;padding: 0;background-color: antiquewhite;}`
+      document.head.appendChild(style)
+    }
+
+    new AutoComplete("keyword");
+  </script>
+</body>
+
+</html>
